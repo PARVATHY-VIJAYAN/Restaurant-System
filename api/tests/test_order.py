@@ -1,7 +1,6 @@
 import unittest
 from fastapi.testclient import TestClient
 from api.order import app
-
 class TestAPI(unittest.TestCase):
 
     def test_add_order(self):
@@ -39,12 +38,3 @@ class TestAPI(unittest.TestCase):
         response = client.delete(f"/orders/{order_id}")
         self.assertEqual(response.status_code,200)
         self.assertEqual(response.json(),{"message":"order cancelled"})
-
-
-    
-
-
-
-
-if __name__ == "__main__":
-    unittest.main()
