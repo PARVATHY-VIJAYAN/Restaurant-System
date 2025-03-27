@@ -1,6 +1,6 @@
 import unittest
 from fastapi.testclient import TestClient
-from api_order import app
+from api.order import app
 
 class TestAPI(unittest.TestCase):
 
@@ -9,9 +9,9 @@ class TestAPI(unittest.TestCase):
         test api which adds new order
         """
         client = TestClient(app)
-        response = client.post("/orders",json = {"item_name":"Sandwich","quantity":1,"price":150,"status":"new order"})
+        response = client.post("/orders",json = {"item_name":"Sandwich","quantity":1})
         assert response.status_code == 201
-        assert response.json() == {"message": {"item_name":"Sandwich","quantity":1,"price":150,"status":"new order"}}
+        assert response.json() == {"message": {"item_name":"Sandwich","quantity":1}}
     
     def test_get_order_status(self):
         """test api which help us to get status of a particular order"""
