@@ -16,7 +16,11 @@ async def get_order_status(order_id: int):
     
     
     return {"Status": "Processing"}
-@app.put("/order/{order_id}")
+
+@app.put("/orders/{order_id}")
+async def update_order(order_id: int):
+    return {"message":"updated"}
+
 @app.delete("/orders/{order_id}")
 async def get_order_cancel(order_id: int):
     
