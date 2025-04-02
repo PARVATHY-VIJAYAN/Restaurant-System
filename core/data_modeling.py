@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import List
 
 @dataclass
 class Order:
@@ -22,6 +21,6 @@ class CustomerOrder:
     """
     order_id: int
     customer_name: str
-    orders: List[Order]
+    orders: list[Order]
     status: str
     delivery_person: str
