@@ -2,8 +2,6 @@ from fastapi import FastAPI, Request
 from api.schema import OrderRequest
 from core.data_modeling import CustomerOrder, Order
 from core.order_store import OrderStore
-from typing import List
-import json
 
 app = FastAPI()
 
