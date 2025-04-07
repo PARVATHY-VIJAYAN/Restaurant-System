@@ -23,7 +23,9 @@ async def add_order(request: OrderRequest)->dict:
                   )
     order_store = OrderStore()
     order_store.add_order(order)
-    return {"message": order.model_dump()}
+    return {"message": "order created successfully",
+            "order":order.model_dump()
+            }
 
 @app.get("/orders/{order_id}")
 async def get_order_by_id(order_id: UUID):
@@ -31,7 +33,9 @@ async def get_order_by_id(order_id: UUID):
     api call for getting the status of an order
     """
     order_store = OrderStore()
-    return order_store.redis_data_store.hget("customer_order",order_id) 
+    return {"message":"Data retrived successfully",
+            "order":order_store.redis_data_store.hget("customer_order",order_id) 
+            }
 
 @app.put("/orders/{order_id}")
 async def update_order_successful(request:Request, order_id: UUID):
@@ -41,7 +45,9 @@ async def update_order_successful(request:Request, order_id: UUID):
     updated_orders = await request.json()
     order_store = OrderStore()
     order_store.update_order(order_id,updated_orders)
-    return {"updated":updated_orders}
+    return {"message":"Order updated successfully",
+            "order":updated_orders
+            }
 
 @app.delete("/orders/{order_id}")
 async def get_order_cancel_successful(order_id: UUID):
