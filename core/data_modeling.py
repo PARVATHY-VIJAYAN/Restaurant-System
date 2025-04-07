@@ -1,8 +1,15 @@
 import uuid
-from dataclasses import dataclass
-from typing import Literal
+from dataclasses import dataclass,field
+from typing import Dict, Literal
 import uuid
-from pydantic import BaseModel,UUID4
+from pydantic import BaseModel,UUID4,Field
+from datetime import date
+
+class IngredientName:
+    SUGAR = "Sugar"
+    SALT = "Salt"
+    FLOUR = "Flour"
+    BUTTER = "Butter"
 
 class Status:
     PENDING = "PENDING"
@@ -10,6 +17,7 @@ class Status:
     COMPLETED = "COMPLETED"
 
     
+
 @dataclass
 class Item:
     """
@@ -18,6 +26,15 @@ class Item:
     """
     name : str
     quantity : int
+
+
+    
+class Ingredient(BaseModel):
+    name: str
+    quantity: int = Field(ge=0)
+    expiry_date: date
+
+
 
 class Order(BaseModel):
     """
@@ -28,7 +45,7 @@ class Order(BaseModel):
             -> orders : list of ordered item (type = Item)
             -> status : status of the order (restricted the values: 'PENDING', 'IN PROGRESS' , 'COMPLETED')
             -> delivery_person: name of the person who delivers the product"
-    """ 
+    """
     id:UUID4 = uuid.uuid4()
     customer_name: str
     orders: list[Item]

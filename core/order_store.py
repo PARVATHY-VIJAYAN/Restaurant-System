@@ -1,9 +1,8 @@
-from core.redis_client import redis_client
-from core.data_modeling import Order
 import json
 from dataclasses import asdict
 from uuid import UUID
-
+from core.redis_client import redis_client
+from core.data_modeling import Order
 
 class OrderStore:
     """
