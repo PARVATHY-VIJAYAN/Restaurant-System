@@ -16,9 +16,7 @@ class OrderStore:
         """
         order = Order.model_validate(order_data)
         order.id = uuid.uuid4()
-        customer_order_dict = {
-            order.id : json.dumps(order.model_dump_json())
-        }
+        customer_order_dict = {str(order.id): order.model_dump_json()}
         self.redis_data_store.hset("customer_order", mapping=customer_order_dict)
         return order
     
@@ -41,5 +39,7 @@ class OrderStore:
         delete an order details from redis.
         """
         return self.redis_data_store.hdel("customer_order",order_id)
-        
+    
+    def get_all(self,key:str):
+        return self.redis_data_store.hgetall("customer_store")
     

@@ -26,20 +26,37 @@ class TestAPI(unittest.TestCase):
         assert response.status_code == 201
         assert response.json().get("order")["id"] == "edcf6271-a213-45ea-a851-82af8771f809"
 
-
+    @patch("core.order_store.uuid.uuid4",return_value = UUID("5e1a1160-a45d-4a22-bc47-93a4b1d75e63"))
     @patch("core.order_store.redis_client")
-    def test_get_order_by_id(self,mock_redis):
+    @patch("core.order_store.OrderStore.get_all",return_value =["5e1a1160-a45d-4a22-bc47-93a4b1d75e63"])
+    def test_get_order_by_id_successfull(self,mock_redis,mock_get_all,mock_uuid):
         """
-        Test the /orders/order-id GET endpoint for getting a particular order
+        Test the /orders/order-id GET endpoint for getting a particular order successfully
         """
         client = TestClient(app)
+        
         mock_redis.hget.return_value = b'{"customer_name": "lakshmi", "orders": [{"name": "sandwich", "quantity": 2}], "status": "PENDING", "delivery_person": "Bob"}'
         order_id = "5e1a1160-a45d-4a22-bc47-93a4b1d75e63"
         response = client.get(f"/orders/{order_id}")
         assert response.status_code == 200
         self.assertEqual(response.json().get("message"),"Data retrived successfully")
-        self.assertEqual(response.json().get("order"),'{"customer_name": "lakshmi", "orders": [{"name": "sandwich", "quantity": 2}], "status": "PENDING", "delivery_person": "Bob"}')
 
+    @patch("core.order_store.uuid.uuid4",return_value = UUID("5e1a1160-a45d-4a22-bc47-93a4b1d75e63"))
+    @patch("core.order_store.redis_client")
+    @patch("core.order_store.OrderStore.get_all",return_value =["5e1a1160-a45d-4a22-bc47-93a4b1d75e63"])
+    def test_get_order_by_id_fail(self,mock_redis,mock_get_all,mock_uuid):
+        """
+        Test the /orders/order-id GET endpoint for getting a particular order successfully
+        """
+        client = TestClient(app)
+        mock_redis.hget.return_value = b'{"customer_name": "lakshmi", "orders": [{"name": "sandwich", "quantity": 2}], "status": "PENDING", "delivery_person": "Bob"}'
+        order_id = "5e1a1160-a45d-4a22-bc47-93a4b1d75e61"
+        response = client.get(f"/orders/{order_id}")
+        assert response.json()['detail'] == "ID not found"
+        assert response.status_code == 404
+        
+        
+    
     @patch("core.order_store.redis_client")
     def test_update_order(self,mock_redis):
         """

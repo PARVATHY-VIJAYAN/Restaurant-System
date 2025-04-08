@@ -69,3 +69,12 @@ class TestOrderStore(unittest.TestCase):
         order_id = "5e1a1160-a45d-4a22-bc47-93a4b1d75e63"
         mock_redis.hdel.return_value = 1
         self.assertEqual(obj.delete_order(order_id),1)
+
+    @patch("core.order_store.redis_client")
+    def test_get_all(self,mock_redis):
+        """
+        Test for function which returns all the details from redis with key = customer_store.
+        """
+        mock_redis.hgetall.return_value = {"dummy-key":"dummy-value"}
+        obj = OrderStore()
+        self.assertEqual(obj.get_all("customer_store"),{"dummy-key":"dummy-value"})
