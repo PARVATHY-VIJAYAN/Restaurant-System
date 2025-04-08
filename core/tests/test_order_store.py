@@ -7,18 +7,24 @@ from uuid import UUID
 
 from core.data_modeling import Status
 class TestOrderStore(unittest.TestCase):
-
+    
+    @patch("core.order_store.uuid.uuid4", return_value = UUID("edcf6271-a213-45ea-a851-82af8771f809"))
     @patch("core.order_store.redis_client")
-    def test_add(self,mock_redis):
+    def test_add(self,mock_redis,mock_uuid):
         """
         testing add function if OrderStore class
         """
         mock_redis.hset.return_value = 1
         obj = OrderStore()
-        #dummy values
         order = Item(name="sandwich",quantity=2)
         customer_order = Order(customer_name="parvathy",orders=[order],status=Status.PENDING, delivery_person="Bob")
-        self.assertEqual(obj.add_order(customer_order),1)
+        self.assertEqual(obj.add_order(customer_order),
+                         Order(id="edcf6271-a213-45ea-a851-82af8771f809", 
+                               customer_name='parvathy',
+                               orders=[Item(name='sandwich', quantity=2)],
+                               status='PENDING',
+                               delivery_person='Bob')
+                        )
 
     @patch("core.order_store.redis_client")
     def test_get_order_by_id(self,mock_redis):

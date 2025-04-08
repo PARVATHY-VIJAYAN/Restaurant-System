@@ -1,12 +1,10 @@
 """
 Module which defines api calls for add,update, delete and get orders 
 """
-from uuid import UUID
+from pydantic import UUID4
 from fastapi import FastAPI, Request
 from api.schema import OrderRequest
-from core.data_modeling import Order
 from core.order_store import OrderStore
-from core.data_modeling import Status
 
 app = FastAPI()
 
@@ -15,30 +13,34 @@ async def add_order(request: OrderRequest)->dict:
     """
     api call for adding an new order
     """
-    order = Order(
-                  customer_name=request.customer_name,
-                  orders=request.orders,
-                  status= Status.PENDING,
-                  delivery_person=request.delivery_person
-                  )
+    order_data ={
+                  "customer_name":request.customer_name,
+                  "orders":request.orders,
+                  "delivery_person":request.delivery_person
+                }
     order_store = OrderStore()
-    order_store.add_order(order)
+    order = order_store.add_order(order_data)
     return {"message": "order created successfully",
             "order":order.model_dump()
             }
 
 @app.get("/orders/{order_id}")
-async def get_order_by_id(order_id: UUID):
+async def get_order_by_id(order_id: UUID4):
     """
     api call for getting the status of an order
     """
     order_store = OrderStore()
     return {"message":"Data retrived successfully",
-            "order":order_store.redis_data_store.hget("customer_order",order_id) 
+            "order":order_store.redis_data_store.hget("customer_order",order_id) ,
+            "_link":{"self": {"href":f"orders/{order_id}"},
+                     "update":{"href" : f"orders/{order_id}"},
+                     "delete": {"href": f"orders/{order_id}"}
+                     }
             }
 
-@app.put("/orders/{order_id}")
-async def update_order_successful(request:Request, order_id: UUID):
+#PATCH → used when u modify part of an existing resource (partial update)
+@app.patch("/orders/{order_id}")
+async def update_order_successful(request:Request, order_id: UUID4):
     """
     data contain updated orders in {order_itemname: qtuantity,...} format
     """
@@ -49,11 +51,12 @@ async def update_order_successful(request:Request, order_id: UUID):
             "order":updated_orders
             }
 
-@app.delete("/orders/{order_id}")
-async def get_order_cancel_successful(order_id: UUID):
+@app.delete("/orders/{order_id}",status_code=204)
+async def get_order_cancel_successful(order_id: UUID4):
     """
     api call for delete an order using order id.
     """
     order_store = OrderStore()
-    if order_store.delete_order(order_id):
-        return {"message": "deleted"}
+    order_store.delete_order(order_id)
+    # if order_store.delete_order(order_id):
+        # return {"message": "deleted"}
